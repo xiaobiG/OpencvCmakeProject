@@ -83,6 +83,44 @@ void trackBarDemo()
     destroyAllWindows();
 }
 
+// --------------------------------------------
+// video demo
+// --------------------------------------------
+void videoDemo(){
+    // VideoCapture capture(0);
+    VideoCapture capture("/Volumes/m3/123.mp4");
+    
+    int width = capture.get(CAP_PROP_FRAME_WIDTH);
+    int height = capture.get(CAP_PROP_FRAME_HEIGHT);
+    int count = capture.get(CAP_PROP_FRAME_COUNT);
+    double fps = capture.get(CAP_PROP_FPS);
+    cout << width << "," << height << "," << count << "," << fps << endl;
+
+    VideoWriter writer("/Users/box/123.mp4", capture.get(CAP_PROP_FOURCC), fps, Size(width, height), true);
+
+    Mat frame;
+    while(true){
+        capture.read(frame);
+        if(frame.empty()){
+            break;
+        }
+
+        // flip(frame, frame, 1); // 翻转
+        cvtColor(frame, frame, COLOR_BGR2GRAY);
+        
+        writer.write(frame);
+
+        imshow("video", frame);
+        int key = waitKey(1);// 等待10毫秒, 控制帧率
+        if(key == 27){ // esc
+            break;
+        }
+    }
+
+    capture.release();
+    writer.release();
+}
+
 int main()
 {
 
@@ -92,7 +130,9 @@ int main()
 
     // colorSpaceDemo();
 
-    drawDemo();
+    // drawDemo();
+
+    videoDemo();
 
     return 0;
 }
