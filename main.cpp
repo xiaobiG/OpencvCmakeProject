@@ -87,38 +87,36 @@ void trackBarDemo()
 // video demo
 // --------------------------------------------
 void videoDemo(){
-    // VideoCapture capture(0);
-    VideoCapture capture("/Volumes/m3/123.mp4");
-    
-    int width = capture.get(CAP_PROP_FRAME_WIDTH);
-    int height = capture.get(CAP_PROP_FRAME_HEIGHT);
-    int count = capture.get(CAP_PROP_FRAME_COUNT);
-    double fps = capture.get(CAP_PROP_FPS);
-    cout << width << "," << height << "," << count << "," << fps << endl;
+    // 打开视频文件
+    cv::VideoCapture cap("F:/WorkSpace/20230228_105727.mp4");
 
-    VideoWriter writer("/Users/box/123.mp4", capture.get(CAP_PROP_FOURCC), fps, Size(width, height), true);
+    // 如果无法打开视频，则返回错误
+    if (!cap.isOpened())
+        return -1;
 
-    Mat frame;
-    while(true){
-        capture.read(frame);
-        if(frame.empty()){
+    // 获取视频的总帧数和帧率
+    int total_frames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+    double fps = cap.get(cv::CAP_PROP_FPS);
+
+    // 计算每一帧所需时间（以毫秒为单位）
+    int frame_time = 1000 / fps;
+
+    while (true)
+    {
+        cv::Mat frame;
+        cap >> frame; // 读取下一帧
+
+        // 如果没有帧，则退出循环
+        if (frame.empty())
             break;
-        }
 
-        // flip(frame, frame, 1); // 翻转
-        cvtColor(frame, frame, COLOR_BGR2GRAY);
-        
-        writer.write(frame);
+        cv::imshow("Video", frame); // 显示帧
+        cv::waitKey(frame_time); // 等待指定时间（以确保恰好按照指定的帧率播放视频）
 
-        imshow("video", frame);
-        int key = waitKey(1);// 等待10毫秒, 控制帧率
-        if(key == 27){ // esc
+        // 如果用户按下 ESC 键，则退出循环
+        if (cv::waitKey(1) == 27)
             break;
-        }
     }
-
-    capture.release();
-    writer.release();
 }
 
 int main()
